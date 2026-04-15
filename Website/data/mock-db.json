@@ -1,0 +1,31 @@
+{
+  "users": {
+    "demo-user": {
+      "id": "demo-user",
+      "email": "demo@greenai.com",
+      "display_name": "Demo Environmentalist"
+    }
+  },
+  "user_credits": {
+    "demo-user": {
+      "user_id": "demo-user",
+      "total_credits": 550,
+      "credits_earned": 550
+    }
+  },
+  "user_plantings": [
+    {
+      "state": "Andhra Pradesh",
+      "district": "Prakasam",
+      "latitude": 0.0002,
+      "longitude": 0.0002,
+      "species": "neem",
+      "planting_date": "2019-11-11",
+      "photo_urls": [],
+      "id": "qh5l4mwol",
+      "user_id": "demo-user",
+      "created_at": "2026-04-04T23:28:52.281Z",
+      "verification_status": "verified"
+    }
+  ]
+}

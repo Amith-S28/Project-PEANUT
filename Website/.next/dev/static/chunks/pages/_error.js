@@ -1,0 +1,13 @@
+__turbopack_load_page_chunks__("/_error", [
+  "static/chunks/798be_next_dist_compiled_a3128142._.js",
+  "static/chunks/798be_next_dist_shared_lib_0966e6c1._.js",
+  "static/chunks/798be_next_dist_client_9ba90f4f._.js",
+  "static/chunks/798be_next_dist_a20fa596._.js",
+  "static/chunks/798be_next_error_68a57f95.js",
+  "static/chunks/[next]_entry_page-loader_ts_6a587f6b._.js",
+  "static/chunks/798be_react-dom_c5b2cf4a._.js",
+  "static/chunks/798be_4c46f320._.js",
+  "static/chunks/[root-of-the-server]__8a5318ee._.js",
+  "static/chunks/Website_pages__error_2da965e7._.js",
+  "static/chunks/turbopack-Website_pages__error_2b28e72b._.js"
+])
