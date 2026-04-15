@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 14, "column": 0}, "map": {"version":3,"sources":["file:///D:/Capstone_Projec/ProjecWebService/Website/app/auth/login/page.tsx"],"sourcesContent":["import Link from 'next/link'\n\nexport default function LoginPage() {\n  return (\n    <div className=\"min-h-screen flex items-center justify-center bg-background\">\n      <div className=\"max-w-md w-full space-y-8 p-8 border border-border rounded-xl text-center\">\n        <h2 className=\"text-3xl font-bold\">Welcome Back</h2>\n        <p className=\"text-muted-foreground\">This is a local instance running with a mock backend.</p>\n        <Link href=\"/dashboard\" className=\"block w-full py-3 bg-accent text-accent-foreground rounded-lg hover:opacity-90 transition-opacity\">\n          Login as Demo User\n        </Link>\n      </div>\n    </div>\n  )\n}\n"],"names":[],"mappings":";;;;;AAAA;;;AAEe,SAAS;IACtB,qBACE,yPAAC;QAAI,WAAU;kBACb,cAAA,yPAAC;YAAI,WAAU;;8BACb,yPAAC;oBAAG,WAAU;8BAAqB;;;;;;8BACnC,yPAAC;oBAAE,WAAU;8BAAwB;;;;;;8BACrC,yPAAC,qMAAI;oBAAC,MAAK;oBAAa,WAAU;8BAAoG;;;;;;;;;;;;;;;;;AAM9I","debugId":null}}]
-}
