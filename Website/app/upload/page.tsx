@@ -8,12 +8,14 @@ import { Upload, MapPin, Leaf, CheckCircle2, AlertCircle } from 'lucide-react'
 import { TREE_SPECIES } from "@/lib/placeholder-data"
 import { useRouter } from 'next/navigation'
 import exifr from 'exifr'
+import Tesseract from 'tesseract.js'
+import { toast } from 'sonner'
 import { AuthOverlay } from "@/components/auth-overlay"
 
 type UploadStep = "location" | "photos" | "details" | "success"
 
 export default function UploadPage() {
-  const [currentStep, setCurrentStep] = useState<UploadStep>("location")
+  const [currentStep, setCurrentStep] = useState<UploadStep>("photos")
   const [formData, setFormData] = useState({
     state: "",
     district: "",
@@ -102,7 +104,48 @@ export default function UploadPage() {
             latitude: gps.latitude.toFixed(6),
             longitude: gps.longitude.toFixed(6)
           }))
-          alert("Coordinates successfully auto-filled from photo metadata!")
+          toast.success("Coordinates successfully auto-filled from photo metadata!")
+        } else {
+          // Fallback to OCR for stamped GPS Map Camera photos
+          const loadingToast = toast.loading("No EXIF metadata found. Scanning image for visible coordinate text... This might take a few seconds.")
+          try {
+            const result = await Tesseract.recognize(file, 'eng')
+            const text = result.data.text
+            const latMatch = text.match(/Lat(?:itude)?[:\s]*([-+]?[0-9]*\.?[0-9]+)/i)
+            const lonMatch = text.match(/Long(?:itude)?[:\s]*([-+]?[0-9]*\.?[0-9]+)/i)
+            
+            let foundState = ""
+            let foundDistrict = ""
+            
+            const matchedState = statesList.find(s => text.toLowerCase().includes(s.toLowerCase()))
+            if (matchedState) {
+               foundState = matchedState
+               try {
+                  const res = await fetch(`/api/districts?state=${encodeURIComponent(foundState)}&limit=1000`)
+                  if (res.ok) {
+                    const data = await res.json()
+                    const matchedDistrict = data.find((d: any) => text.toLowerCase().includes(d.district.toLowerCase()))
+                    if (matchedDistrict) foundDistrict = matchedDistrict.district
+                  }
+               } catch(e) {}
+            }
+            
+            if (latMatch && lonMatch) {
+              setFormData((prev) => ({
+                ...prev,
+                latitude: parseFloat(latMatch[1]).toFixed(6),
+                longitude: parseFloat(lonMatch[1]).toFixed(6),
+                ...(foundState ? { state: foundState } : {}),
+                ...(foundDistrict ? { district: foundDistrict } : {})
+              }))
+              toast.success(`Coordinates ${foundState ? `and location (${foundDistrict}, ${foundState}) ` : ''}extracted from stamped text!`, { id: loadingToast })
+            } else {
+              toast.warning("Could not detect any coordinates on the photo. Please enter them manually.", { id: loadingToast, duration: 5000 })
+            }
+          } catch(ocrError) {
+             console.error("OCR failed", ocrError)
+             toast.error("Failed to scan image. Please enter location manually.", { id: loadingToast })
+          }
         }
       }
     } catch (e) {
@@ -147,7 +190,7 @@ export default function UploadPage() {
       setCurrentStep("success")
     } catch (error) {
       console.error('[v0] Upload error:', error)
-      alert('Failed to submit planting. Please try again.')
+      toast.error('Failed to submit planting. Please try again.')
     } finally {
       setUploading(false)
     }
@@ -185,16 +228,16 @@ export default function UploadPage() {
           </div>
 
           <div className="flex gap-4 mb-12 overflow-x-auto pb-4">
-            {(["location", "photos", "details", "success"] as const).map((step, idx) => {
+            {(["photos", "location", "details", "success"] as const).map((step, idx) => {
               const stepLabels = {
-                location: "Location",
                 photos: "Photos",
+                location: "Location",
                 details: "Details",
                 success: "Complete",
               }
               const isActive = currentStep === step
               const isComplete =
-                ["location", "photos", "details"].indexOf(step) < ["location", "photos", "details"].indexOf(currentStep)
+                ["photos", "location", "details"].indexOf(step) < ["photos", "location", "details"].indexOf(currentStep)
 
               return (
                 <div key={step} className="flex items-center gap-2 flex-shrink-0">
@@ -303,14 +346,23 @@ export default function UploadPage() {
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setCurrentStep("photos")}
-                    disabled={!isLocationValid}
-                    className="w-full px-6 py-3 bg-accent text-accent-foreground rounded-lg font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
-                  >
-                    Continue to Photos
-                  </button>
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep("photos")}
+                      className="flex-1 px-6 py-3 border border-border rounded-lg font-medium hover:bg-muted transition-colors"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep("details")}
+                      disabled={!isLocationValid}
+                      className="flex-1 px-6 py-3 bg-accent text-accent-foreground rounded-lg font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                    >
+                      Continue to Details
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -364,23 +416,14 @@ export default function UploadPage() {
                     </div>
                   )}
 
-                  <div className="flex gap-4">
-                    <button
-                      type="button"
-                      onClick={() => setCurrentStep("location")}
-                      className="flex-1 px-6 py-3 border border-border rounded-lg font-medium hover:bg-muted transition-colors"
-                    >
-                      Back
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setCurrentStep("details")}
-                      disabled={!isPhotosValid}
-                      className="flex-1 px-6 py-3 bg-accent text-accent-foreground rounded-lg font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
-                    >
-                      Continue to Details
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep("location")}
+                    disabled={!isPhotosValid}
+                    className="w-full px-6 py-3 bg-accent text-accent-foreground rounded-lg font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                  >
+                    Continue to Location
+                  </button>
                 </div>
               )}
 
@@ -417,7 +460,7 @@ export default function UploadPage() {
                           type="date"
                           value={formData.plantingDate}
                           onChange={(e) => setFormData((prev) => ({ ...prev, plantingDate: e.target.value }))}
-                          className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground"
+                          className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground dark:[color-scheme:dark]"
                         />
                       </div>
 
@@ -453,7 +496,7 @@ export default function UploadPage() {
                   <div className="flex gap-4">
                     <button
                       type="button"
-                      onClick={() => setCurrentStep("photos")}
+                      onClick={() => setCurrentStep("location")}
                       className="flex-1 px-6 py-3 border border-border rounded-lg font-medium hover:bg-muted transition-colors"
                     >
                       Back

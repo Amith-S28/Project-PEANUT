@@ -107,10 +107,10 @@ export default function HomePage() {
                 Explore Map
               </Link>
               <Link
-                href="/plant"
+                href="/florawiki"
                 className="px-8 py-3 border border-border bg-card text-foreground rounded-lg font-medium shadow-md hover:shadow-lg hover:bg-muted hover:-translate-y-0.5 transition-all duration-200"
               >
-                Start Planting
+                Browse FloraWiki
               </Link>
             </div>
           </div>
@@ -260,7 +260,7 @@ export default function HomePage() {
               Join thousands of planters using data-driven decisions to build a greener future.
             </p>
             <Link
-              href="/plant"
+              href="/florawiki"
               className="inline-block px-8 py-3 bg-accent text-accent-foreground rounded-lg font-medium shadow-lg shadow-accent/20 hover:shadow-xl hover:shadow-accent/30 hover:-translate-y-0.5 transition-all duration-200"
             >
               Start Your Journey

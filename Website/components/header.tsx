@@ -44,7 +44,7 @@ export function Header() {
 
   const navItems = [
     { href: "/map", label: "Map" },
-    { href: "/plant", label: "Plant" },
+    { href: "/florawiki", label: "FloraWiki" },
     { href: "/upload", label: "Upload" },
     { href: "/credits", label: "Credits" },
     { href: "/profile", label: "Profile" },

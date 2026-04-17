@@ -89,26 +89,36 @@ export default async function DashboardPage() {
             </div>
 
             {plantings.length > 0 ? (
-              <div className="space-y-4">
-                {plantings.slice(0, 5).map((planting, idx) => (
+              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                {plantings.map((planting, idx) => (
                   <div 
                     key={planting.id} 
                     className="flex items-center justify-between p-4 border border-border/40 rounded-lg hover:bg-muted/50 hover:shadow-md transition-all duration-200 animate-slide-in-right"
-                    style={{ animationDelay: `${0.1 * idx}s` }}
+                    style={{ animationDelay: `${0.1 * idx > 0.5 ? 0.5 : 0.1 * idx}s` }}
                   >
                     <div className="flex-1">
                       <h3 className="font-semibold">{planting.species}</h3>
                       <p className="text-sm text-muted-foreground">
                         {planting.district}, {planting.state} • {new Date(planting.planting_date).toLocaleDateString()}
                       </p>
+                      {planting.status === "rejected" && planting.rejection_reason && (
+                        <div className="mt-2 text-sm text-red-500 bg-red-500/10 p-2 rounded border border-red-500/20 max-w-sm">
+                          <span className="font-semibold flex items-center gap-1.5 mb-0.5">
+                             Reason for Rejection:
+                          </span> 
+                          {planting.rejection_reason}
+                        </div>
+                      )}
                     </div>
                     <div className="text-right space-y-1">
                       <div className={`text-sm font-medium px-3 py-1 rounded-full transition-colors ${
                         planting.status === "verified" || planting.status === "approved"
                           ? "bg-accent/10 text-accent"
+                          : planting.status === "rejected"
+                          ? "bg-red-500/10 text-red-500"
                           : "bg-muted text-muted-foreground"
                       }`}>
-                        {planting.status}
+                        {planting.status === "rejected" ? "Request Rejected" : planting.status}
                       </div>
                       {planting.credits_earned > 0 && (
                         <div className="text-sm text-accent font-semibold">+{planting.credits_earned} credits</div>
@@ -133,11 +143,11 @@ export default async function DashboardPage() {
           {/* Actions */}
           <div className="grid md:grid-cols-2 gap-6">
             <Link
-              href="/plant"
+              href="/florawiki"
               className="bg-accent/10 border border-accent/20 rounded-lg p-6 hover:bg-accent/15 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 space-y-2 animate-fade-in-up"
               style={{ animationDelay: '0.5s' }}
             >
-              <h3 className="font-semibold text-lg">Find Trees to Plant</h3>
+              <h3 className="font-semibold text-lg">FloraWiki Species Guide</h3>
               <p className="text-sm text-muted-foreground">
                 Get recommendations tailored to your region's climate
               </p>

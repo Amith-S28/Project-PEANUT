@@ -26,7 +26,7 @@ export function initCSVDB() {
 
   if (!fs.existsSync(REQUESTS_FILE)) {
     fs.writeFileSync(REQUESTS_FILE, stringify([], { 
-      columns: ['id', 'user_id', 'species', 'state', 'district', 'planting_date', 'status', 'credits_earned', 'created_at'], 
+      columns: ['id', 'user_id', 'species', 'state', 'district', 'planting_date', 'photo_urls', 'status', 'credits_earned', 'created_at', 'rejection_reason'], 
       header: true 
     }));
   }
@@ -50,7 +50,10 @@ export function readRequests() {
 }
 
 export function writeRequests(requests: any[]) {
-  const content = stringify(requests, { header: true });
+  const content = stringify(requests, { 
+    columns: ['id', 'user_id', 'species', 'state', 'district', 'planting_date', 'photo_urls', 'status', 'credits_earned', 'created_at', 'rejection_reason'],
+    header: true 
+  });
   fs.writeFileSync(REQUESTS_FILE, content);
 }
 
@@ -90,7 +93,8 @@ export function addPlanting(userId: string, planting: any) {
     photo_urls: planting.photo_urls || '',
     status: "pending",
     credits_earned: 0,
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(),
+    rejection_reason: ""
   };
   requests.push(newPlanting);
   writeRequests(requests);
